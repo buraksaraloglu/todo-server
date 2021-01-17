@@ -8,7 +8,7 @@
     "dev": "nodemon src/index.js",
     "lint": "eslint --fix src",
     "test": "mocha --exit",
-    "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm install --prefix ../client && npm run build --prefix ../client"
+    "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm install && npm run start"
   },
   "keywords": [],
   "author": "Burak Saraloglu",

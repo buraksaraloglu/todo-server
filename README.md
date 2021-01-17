@@ -1,7 +1,7 @@
 ## Todo App - Backend
 
 It's a todo app server built with Express.
-Main repo: [todo](https://github.com/buraksaraloglu/todo)
+Main repo: [Todo](https://github.com/buraksaraloglu/todo)
 
 ### Important Specs
 

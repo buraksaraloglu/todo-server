@@ -4,7 +4,7 @@
   "description": "todo app server by burak saraloglu",
   "main": "index.js",
   "scripts": {
-    "start": "node src/index.js",
+    "start": "npm install && node src/index.js",
     "dev": "nodemon src/index.js",
     "lint": "eslint --fix src",
     "test": "mocha --exit",

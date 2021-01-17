@@ -13,7 +13,7 @@ const connectDB = async () => {
         useFindAndModify: false,
       })
       // eslint-disable-next-line no-console
-      .then(console.log('db connected'))
+      .then(() => {}))
       // eslint-disable-next-line no-console
       .catch((error) => console.log(error)));
 };

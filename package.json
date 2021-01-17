@@ -4,11 +4,10 @@
   "description": "todo app server by burak saraloglu",
   "main": "index.js",
   "scripts": {
-    "start": "npm install && node src/index.js",
+    "start": "node src/index.js",
     "dev": "nodemon src/index.js",
     "lint": "eslint --fix src",
-    "test": "mocha --exit",
-    "heroku-postbuild": "npm install && npm run start"
+    "test": "mocha --exit"
   },
   "keywords": [],
   "author": "Burak Saraloglu",

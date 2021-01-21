@@ -6,6 +6,7 @@
 const express = require('express');
 const rateLimit = require('express-rate-limit');
 const slowDown = require('express-slow-down');
+const { body } = require('express-validator');
 
 const Todo = require('../db/todoSchema');
 
@@ -30,9 +31,9 @@ let cacheTime;
 
 // Get all todos
 router.get('/', limiter, speedLimiter, async (req, res, next) => {
-  // if (cacheTime && cacheTime > Date.now() - desiredCacheTime) {
-  //   return res.json(cachedData);
-  // }
+  if (cacheTime && cacheTime > Date.now() - desiredCacheTime) {
+    return res.json(cachedData);
+  }
 
   try {
     await Todo.find().then((todo) => {
@@ -47,28 +48,39 @@ router.get('/', limiter, speedLimiter, async (req, res, next) => {
 });
 
 // Add one todo
-router.post('/', limiter, speedLimiter, async (req, res, next) => {
-  try {
-    const { content, completed } = req.body;
-    const todo = {
-      content,
-      completed,
-      createdAt: Date.now(),
-      updatedAt: Date.now(),
-    };
+router.post(
+  '/',
+  limiter,
+  speedLimiter,
+  body('content')
+    .not()
+    .isEmpty()
+    .withMessage('Todo cannot be empty.')
+    .trim()
+    .escape(),
+  async (req, res, next) => {
+    try {
+      const { content, completed } = req.body;
+      const todo = {
+        content,
+        completed,
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+      };
 
-    const todoModal = new Todo(todo);
-    await todoModal.save();
+      const todoModal = new Todo(todo);
+      await todoModal.save();
 
-    if (cachedData) {
-      cachedData.push(todoModal);
-      cacheTime = Date.now();
+      if (cachedData) {
+        cachedData.push(todoModal);
+        cacheTime = Date.now();
+      }
+      res.json(todoModal);
+    } catch (err) {
+      next(err);
     }
-    res.json(todoModal);
-  } catch (err) {
-    next(err);
   }
-});
+);
 
 // Update one todo
 router.put('/:id', async (req, res, next) => {

@@ -54,14 +54,14 @@ router.post('/', limiter, speedLimiter, async (req, res, next) => {
     };
 
     const todoModal = new Todo(todo);
-    await todoModal.save();
+    await todoModal.save().then(() => {
+      if (cachedData) {
+        cachedData.push(todoModal);
+        cacheTime = Date.now();
+      }
 
-    if (cachedData) {
-      cachedData.push(todoModal);
-      cacheTime = Date.now();
-    }
-
-    res.json(todoModal);
+      res.json(todoModal);
+    });
   } catch (err) {
     next(err);
   }
@@ -76,18 +76,18 @@ router.put('/:id', async (req, res, next) => {
       updatedAt: Date.now(),
     };
 
-    await Todo.findByIdAndUpdate(id, todo);
+    await Todo.findByIdAndUpdate(id, todo).then(() => {
+      if (cachedData) {
+        cachedData.map((todoItem, index) => {
+          if (todoItem.id === id) {
+            cachedData[index] = { ...todo };
+            cacheTime = Date.now();
+          }
+        });
+      }
 
-    if (cachedData) {
-      cachedData.map((todoItem, index) => {
-        if (todoItem.id === id) {
-          cachedData[index] = { ...todo };
-          cacheTime = Date.now();
-        }
-      });
-    }
-
-    res.json(todo);
+      res.json(todo);
+    });
   } catch (err) {
     next(err);
   }

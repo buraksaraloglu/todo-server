@@ -1,8 +1,4 @@
-/* eslint-disable operator-linebreak */
-/* eslint-disable no-unused-expressions */
 /* eslint-disable array-callback-return */
-/* eslint-disable implicit-arrow-linebreak */
-/* eslint-disable consistent-return */
 const express = require('express');
 const rateLimit = require('express-rate-limit');
 const slowDown = require('express-slow-down');
@@ -31,7 +27,7 @@ let cacheTime;
 // Get all todos
 router.get('/', limiter, speedLimiter, async (req, res, next) => {
   if (cacheTime && cacheTime > Date.now() - desiredCacheTime) {
-    return res.json(cachedData);
+    res.json(cachedData);
   }
 
   try {
@@ -39,10 +35,10 @@ router.get('/', limiter, speedLimiter, async (req, res, next) => {
       cacheTime = Date.now();
       todo.cacheTime = cacheTime;
       cachedData = todo;
-      return res.json(todo);
+      res.json(todo);
     });
   } catch (err) {
-    return next(err);
+    next(err);
   }
 });
 
@@ -64,6 +60,7 @@ router.post('/', limiter, speedLimiter, async (req, res, next) => {
       cachedData.push(todoModal);
       cacheTime = Date.now();
     }
+
     res.json(todoModal);
   } catch (err) {
     next(err);
@@ -80,14 +77,17 @@ router.put('/:id', async (req, res, next) => {
     };
 
     await Todo.findByIdAndUpdate(id, todo);
-    cachedData &&
+
+    if (cachedData) {
       cachedData.map((todoItem, index) => {
         if (todoItem.id === id) {
           cachedData[index] = { ...todo };
           cacheTime = Date.now();
         }
       });
-    return res.json(todo);
+    }
+
+    res.json(todo);
   } catch (err) {
     next(err);
   }
@@ -100,13 +100,16 @@ router.delete('/:id', async (req, res, next) => {
     await Todo.findByIdAndDelete(id, (err) => {
       if (err) next(err);
     });
-    cachedData &&
+
+    if (cachedData) {
       cachedData.map((todoItem, index) => {
-        if (todoItem._id === id) {
+        if (todoItem.id === id) {
           cachedData.splice(index, 1);
           cacheTime = Date.now();
         }
       });
+    }
+
     res.sendStatus(200);
   } catch (error) {
     next(error);

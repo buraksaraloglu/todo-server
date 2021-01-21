@@ -53,7 +53,9 @@ router.post(
   '/',
   limiter,
   speedLimiter,
-  check('content').not().isEmpty().withMessage('Todo cannot be empty.'),
+  check('content')
+    .isLength({ min: 4 })
+    .withMessage('Minimum length of todo should be atleast 4 chars.'),
   body('content').not().isEmpty().trim().escape(),
   async (req, res, next) => {
     try {

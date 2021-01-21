@@ -1,4 +1,3 @@
-/* eslint-disable newline-per-chained-call */
 /* eslint-disable operator-linebreak */
 /* eslint-disable no-unused-expressions */
 /* eslint-disable array-callback-return */
@@ -7,7 +6,6 @@
 const express = require('express');
 const rateLimit = require('express-rate-limit');
 const slowDown = require('express-slow-down');
-const { body, check } = require('express-validator');
 
 const Todo = require('../db/todoSchema');
 
@@ -49,37 +47,28 @@ router.get('/', limiter, speedLimiter, async (req, res, next) => {
 });
 
 // Add one todo
-router.post(
-  '/',
-  limiter,
-  speedLimiter,
-  check('content')
-    .isLength({ min: 4 })
-    .withMessage('Minimum length of todo should be atleast 4 chars.'),
-  body('content').not().isEmpty().trim().escape(),
-  async (req, res, next) => {
-    try {
-      const { content, completed } = req.body;
-      const todo = {
-        content,
-        completed,
-        createdAt: Date.now(),
-        updatedAt: Date.now(),
-      };
+router.post('/', limiter, speedLimiter, async (req, res, next) => {
+  try {
+    const { content, completed } = req.body;
+    const todo = {
+      content,
+      completed,
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+    };
 
-      const todoModal = new Todo(todo);
-      await todoModal.save();
+    const todoModal = new Todo(todo);
+    await todoModal.save();
 
-      if (cachedData) {
-        cachedData.push(todoModal);
-        cacheTime = Date.now();
-      }
-      res.json(todoModal);
-    } catch (err) {
-      next(err);
+    if (cachedData) {
+      cachedData.push(todoModal);
+      cacheTime = Date.now();
     }
+    res.json(todoModal);
+  } catch (err) {
+    next(err);
   }
-);
+});
 
 // Update one todo
 router.put('/:id', async (req, res, next) => {

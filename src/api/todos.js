@@ -1,3 +1,4 @@
+/* eslint-disable newline-per-chained-call */
 /* eslint-disable operator-linebreak */
 /* eslint-disable no-unused-expressions */
 /* eslint-disable array-callback-return */
@@ -6,7 +7,7 @@
 const express = require('express');
 const rateLimit = require('express-rate-limit');
 const slowDown = require('express-slow-down');
-const { body } = require('express-validator');
+const { body, check } = require('express-validator');
 
 const Todo = require('../db/todoSchema');
 
@@ -52,12 +53,8 @@ router.post(
   '/',
   limiter,
   speedLimiter,
-  body('content')
-    .not()
-    .isEmpty()
-    .withMessage('Todo cannot be empty.')
-    .trim()
-    .escape(),
+  check('content').not().isEmpty().withMessage('Todo cannot be empty.'),
+  body('content').not().isEmpty().trim().escape(),
   async (req, res, next) => {
     try {
       const { content, completed } = req.body;
